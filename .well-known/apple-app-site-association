@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["QFZV6F6PS9.com.thebrunopetkovic.swaypoint"],
+        "components": [
+          { "/": "/join/*", "comment": "Swaypoint trip invites" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["QFZV6F6PS9.com.thebrunopetkovic.swaypoint"]
+  }
+}
