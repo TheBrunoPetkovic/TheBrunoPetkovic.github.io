@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join a trip on Swaypoint</title>
+<meta name="description" content="You're invited to plan a trip together on Swaypoint. Swipe on places, match with friends, get the plan.">
+<meta property="og:title" content="You're invited to plan a trip on Swaypoint">
+<meta property="og:description" content="Swipe on places with your friends. Swaypoint turns what you all want into a day-by-day plan.">
+<meta property="og:image" content="https://thebrunopetkovic.github.io/join/icon.png">
+<meta name="apple-itunes-app" content="app-id=6823311490">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --ink: #1B1A2E; --coral: #E8552F; --paper: #FFF8F1; --muted: #5B5872; --line: #E6DFD5; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink);
+    font: 17px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 32px 16px;
+  }
+  main { width: 100%; max-width: 420px; text-align: center; }
+  img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 30px rgba(27,26,46,.15); }
+  h1 { font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; margin: 24px 0 8px; }
+  p { color: var(--muted); margin: 0 0 24px; }
+  .code {
+    display: inline-block; margin: 0 0 28px; padding: 10px 18px; border-radius: 12px;
+    border: 1.5px dashed var(--line); font: 600 22px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .18em;
+  }
+  .btn {
+    display: block; width: 100%; padding: 16px; border-radius: 14px; text-decoration: none;
+    font-weight: 600; font-size: 17px; margin-bottom: 12px;
+  }
+  .primary { background: var(--coral); color: #fff; }
+  .secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+  small { display: block; color: var(--muted); margin-top: 16px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <img src="icon.png" alt="Swaypoint app icon">
+  <h1>You're invited to plan a trip</h1>
+  <p>Swipe on places with your friends. Swaypoint turns what you all want into a day-by-day plan.</p>
+  <div class="code" id="code" hidden></div>
+  <a class="btn primary" href="https://apps.apple.com/app/id6823311490">Get Swaypoint</a>
+  <a class="btn secondary" id="open" href="swaypoint://join">I have the app, open invite</a>
+  <small>After installing, open this link again or enter the code in the app.</small>
+</main>
+<script>
+  var code = (new URLSearchParams(location.search).get("code") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+  if (code) {
+    var el = document.getElementById("code");
+    el.textContent = code;
+    el.hidden = false;
+    document.getElementById("open").href = "swaypoint://join?code=" + encodeURIComponent(code);
+  }
+</script>
+</body>
+</html>
