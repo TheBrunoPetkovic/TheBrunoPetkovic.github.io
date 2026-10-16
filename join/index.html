@@ -129,7 +129,7 @@ function h(tag, attrs, ...children) {
   }
   return el;
 }
-function render(...nodes) { app.replaceChildren(...nodes, footer()); window.scrollTo(0, 0); }
+function render(...nodes) { app.replaceChildren(...nodes.flat().filter(n => n != null && n !== false), footer()); window.scrollTo(0, 0); }
 function footer() {
   return h("footer", { class: "muted" }, "Swaypoint · ",
     h("a", { href: "../privacy/" }, "Privacy"), " · ", h("a", { href: "../terms/" }, "Terms"));
