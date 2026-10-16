@@ -408,14 +408,21 @@ const MONTHS = ["january", "february", "march", "april", "may", "june", "july", 
 // The months an event's article mentions ("held every July"); null when none or too many.
 function eventMonths(text) {
   const t = text.toLowerCase();
-  let found = [];
+  // Every month mention with its position; "may" and "march" only next to a date word.
+  const hits = [];
   MONTHS.forEach((w, i) => {
     const re = (w === "may" || w === "march")
       ? new RegExp("(\\b(in|during|early|late|mid|from|until|to|through|of|each|every)[ -]" + w + "\\b)|(\\b\\d{1,2}(st|nd|rd|th)? " + w + "\\b)|(\\b" + w + " \\d{1,2}\\b)")
       : new RegExp("\\b" + w + "\\b");
-    if (re.test(t)) found.push(i + 1);
+    const m = re.exec(t);
+    if (m) hits.push({ month: i + 1, at: m.index });
   });
-  if (!found.length || found.length > 4) return null;
+  if (!hits.length) return null;
+  // Only the sentence where the first month appears: later ones are often other events
+  // ("…held on October 22. The other two are held in May and July.").
+  const first = Math.min(...hits.map(h => h.at));
+  let found = hits.filter(h => h.at - first <= 70 && !t.slice(first, h.at).includes(". ")).map(h => h.month).sort((a, b) => a - b);
+  if (found.length > 3) return null;
   if (found.length === 2 && found[1] - found[0] > 1 && found[1] - found[0] <= 3 &&
       new RegExp("(from|between) .{0,20}" + MONTHS[found[0] - 1] + ".{0,25}(to|and|until|through)").test(t)) {
     const [a, b] = found; found = []; for (let m = a; m <= b; m++) found.push(m);
