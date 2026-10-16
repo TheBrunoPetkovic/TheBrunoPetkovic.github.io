@@ -512,6 +512,10 @@ function cardFor(p) {
   const src = safeURL(p.imageURL);
   const badges = [];
   if (p.wishedBy) badges.push(h("span", { class: "pill", style: "background:var(--orange)" }, "★ " + p.wishedBy + "'s must-see"));
+  if (p.eventFrom && p.eventTo) {
+    const md = x => { const [m, d] = x.split("-").map(Number); return new Date(2000, m - 1, d).toLocaleDateString("en-GB", { month: "short", day: "numeric" }); };
+    badges.push(h("span", { class: "pill", style: "background:#DB2777" }, "On during your trip · " + (p.eventFrom === p.eventTo ? md(p.eventFrom) : md(p.eventFrom) + " – " + md(p.eventTo))));
+  }
   if (cities().length > 1 && p.cityID) { const c = cities().find(x => x.id === p.cityID); if (c) badges.push(h("span", { class: "pill", style: "background:var(--indigo)" }, c.name)); }
   if (p.dayTrip) badges.push(h("span", { class: "pill", style: "background:#0E7490" }, "Day trip · " + p.dayTrip));
   else if (p.hiddenGem) badges.push(h("span", { class: "pill", style: "background:var(--orange)" }, "Hidden gem"));
