@@ -2,57 +2,582 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Join a trip on Swaypoint</title>
 <meta name="description" content="You're invited to plan a trip together on Swaypoint. Swipe on places, match with friends, get the plan.">
 <meta property="og:title" content="You're invited to plan a trip on Swaypoint">
-<meta property="og:description" content="Swipe on places with your friends. Swaypoint turns what you all want into a day-by-day plan.">
+<meta property="og:description" content="Swipe on places with your friends, on your phone or in the browser. Swaypoint turns what you all want into a day-by-day plan.">
 <meta property="og:image" content="https://thebrunopetkovic.github.io/join/icon.png">
 <meta name="apple-itunes-app" content="app-id=6823311490">
+<meta name="theme-color" content="#FFF8F1">
 <link rel="icon" href="icon.png">
 <style>
-  :root { --ink: #1B1A2E; --coral: #E8552F; --paper: #FFF8F1; --muted: #5B5872; --line: #E6DFD5; }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink);
-    font: 17px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
-    display: flex; align-items: center; justify-content: center; padding: 32px 16px;
+  :root {
+    --ink: #1B1A2E; --coral: #E8552F; --coral-dark: #B5401F; --paper: #FFF8F1; --card: #FFFFFF;
+    --muted: #5B5872; --line: #E6DFD5; --fill: #F3EDE5; --green: #1F9D55; --orange: #E8890C; --indigo: #5856D6;
   }
-  main { width: 100%; max-width: 420px; text-align: center; }
-  img { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 30px rgba(27,26,46,.15); }
-  h1 { font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; margin: 24px 0 8px; }
-  p { color: var(--muted); margin: 0 0 24px; }
-  .code {
-    display: inline-block; margin: 0 0 28px; padding: 10px 18px; border-radius: 12px;
-    border: 1.5px dashed var(--line); font: 600 22px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .18em;
-  }
-  .btn {
-    display: block; width: 100%; padding: 16px; border-radius: 14px; text-decoration: none;
-    font-weight: 600; font-size: 17px; margin-bottom: 12px;
-  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 16px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+  main { max-width: 480px; margin: 0 auto; padding: 20px 16px calc(28px + env(safe-area-inset-bottom)); }
+  h1 { font-size: 27px; line-height: 1.15; letter-spacing: -0.02em; margin: 14px 0 6px; }
+  h2 { font-size: 21px; line-height: 1.2; margin: 0 0 4px; letter-spacing: -0.01em; }
+  p { margin: 0 0 14px; color: var(--muted); }
+  .center { text-align: center; }
+  .logo { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 8px 24px rgba(27,26,46,.14); }
+  .btn { display: block; width: 100%; padding: 15px 16px; border-radius: 14px; border: 0; text-decoration: none; text-align: center;
+         font: 600 17px/1.2 inherit; font-family: inherit; cursor: pointer; margin: 0 0 10px; }
+  .btn:disabled { opacity: .5; cursor: default; }
   .primary { background: var(--coral); color: #fff; }
-  .secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
-  small { display: block; color: var(--muted); margin-top: 16px; font-size: 14px; }
+  .secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
+  .link { background: none; color: var(--coral-dark); padding: 10px; font-weight: 600; }
+  input[type=text] { width: 100%; padding: 14px 14px; border-radius: 14px; border: 1px solid var(--line); background: #fff;
+    font: 17px inherit; font-family: inherit; color: var(--ink); outline: none; margin-bottom: 12px; }
+  input[type=text]:focus { border-color: var(--coral); }
+  .cover { width: 100%; height: 190px; object-fit: cover; border-radius: 22px; display: block; background: var(--fill); }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; color: #fff; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13.5px; }
+  .card { background: var(--card); border-radius: 18px; padding: 14px; border: 1px solid var(--line); margin-bottom: 10px; }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .row img, .thumb { width: 54px; height: 54px; border-radius: 12px; object-fit: cover; flex: none; background: var(--fill); }
+  .grow { flex: 1; min-width: 0; }
+  .title { font-weight: 650; }
+  .ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .iconbtn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: #fff; font-size: 20px; line-height: 38px; color: var(--coral); cursor: pointer; flex: none; }
+  .iconbtn.on { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .section { font-size: 12.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 18px 4px 8px; }
+  .bar { height: 6px; border-radius: 3px; background: var(--fill); overflow: hidden; }
+  .bar > div { height: 100%; background: var(--coral); border-radius: 3px; transition: width .3s; }
+  .note { background: #fff; border: 1px dashed var(--line); border-radius: 14px; padding: 12px 14px; font-size: 14.5px; color: var(--muted); margin: 0 0 14px; }
+  /* Deck */
+  .deck { position: relative; height: min(64vh, 540px); margin: 12px 0 14px; touch-action: none; user-select: none; }
+  .swipecard { position: absolute; inset: 0; background: #fff; border-radius: 28px; overflow: hidden; box-shadow: 0 14px 34px rgba(27,26,46,.16);
+               display: flex; flex-direction: column; will-change: transform; }
+  .swipecard .photo { flex: 1; min-height: 0; background: var(--fill) center/cover no-repeat; position: relative; }
+  .swipecard .photo .credit { position: absolute; top: 12px; left: 16px; font-size: 10px; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+  .swipecard .info { padding: 16px 18px 18px; }
+  .swipecard h3 { margin: 6px 0 6px; font-size: 25px; line-height: 1.12; letter-spacing: -0.01em; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag { background: var(--fill); border-radius: 999px; padding: 3px 9px; font-size: 12.5px; font-weight: 650; color: var(--ink); }
+  .blurb { font-size: 14.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
+  .stamp { position: absolute; top: 22px; padding: 6px 14px; border: 3.5px solid; border-radius: 12px; font-weight: 900; font-size: 24px; background: rgba(255,255,255,.92); opacity: 0; pointer-events: none; }
+  .stamp.want { left: 20px; color: var(--green); border-color: var(--green); transform: rotate(-12deg); }
+  .stamp.skip { right: 20px; color: #D7263D; border-color: #D7263D; transform: rotate(12deg); }
+  .stamp.must { left: 50%; top: 35%; transform: translateX(-50%); color: var(--orange); border-color: var(--orange); }
+  .actions { display: flex; justify-content: center; align-items: center; gap: 26px; }
+  .round { width: 64px; height: 64px; border-radius: 50%; border: 0; background: #fff; box-shadow: 0 6px 18px rgba(27,26,46,.14); font-size: 26px; cursor: pointer; }
+  .round.small { width: 52px; height: 52px; font-size: 22px; }
+  .topline { display: flex; align-items: center; gap: 10px; }
+  .topline .bar { flex: 1; }
+  /* Plan */
+  .day { margin-bottom: 18px; }
+  .stop { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .stop:first-of-type { border-top: 0; }
+  .time { width: 52px; flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .travel { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .daytabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px; }
+  .daytab { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 8px 12px; text-align: center; cursor: pointer; font: 600 14px inherit; font-family: inherit; color: var(--ink); }
+  .daytab.on { background: var(--coral); border-color: var(--coral); color: #fff; }
+  .hidden { display: none !important; }
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--line); border-top-color: var(--coral); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 40px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: #fff;
+           padding: 10px 16px; border-radius: 12px; font-size: 14.5px; z-index: 9; opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90vw; }
+  .toast.on { opacity: 1; }
+  footer { text-align: center; font-size: 13px; margin-top: 26px; }
+  footer a { color: var(--coral-dark); }
 </style>
 </head>
 <body>
-<main>
-  <img src="icon.png" alt="Swaypoint app icon">
-  <h1>You're invited to plan a trip</h1>
-  <p>Swipe on places with your friends. Swaypoint turns what you all want into a day-by-day plan.</p>
-  <div class="code" id="code" hidden></div>
-  <a class="btn primary" href="https://apps.apple.com/app/id6823311490">Get Swaypoint</a>
-  <a class="btn secondary" id="open" href="swaypoint://join">I have the app, open invite</a>
-  <small>After installing, open this link again or enter the code in the app.</small>
+<main id="app">
+  <div class="center" id="boot"><div class="spinner"></div><p>Opening the invite…</p></div>
 </main>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <script>
-  var code = (new URLSearchParams(location.search).get("code") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
-  if (code) {
-    var el = document.getElementById("code");
-    el.textContent = code;
-    el.hidden = false;
-    document.getElementById("open").href = "swaypoint://join?code=" + encodeURIComponent(code);
+"use strict";
+// Swaypoint for the web: friends without the iPhone app join, add must-sees, swipe and see the
+// group's plan. Same Supabase project and rules as the app (row level security, guest accounts).
+const SUPABASE_URL = "https://bnbwouyocmjgaratrdyj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_hn4mgxZShl35k0ucOGUUsw_scbHhPI1";
+const APP_STORE = "https://apps.apple.com/app/id6823311490";
+const PALETTE = [0x0E6B5C, 0x7C3AED, 0xB45309, 0x2563EB, 0xBE185D, 0x4D7C0F];
+
+const params = new URLSearchParams(location.search);
+const code = (params.get("code") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const app = document.getElementById("app");
+
+let db = null, me = null, trip = null, members = [], votes = [], wishes = [], plan = null, planDay = 0, channel = null;
+let screen = "preview";
+
+// ---------- tiny DOM helpers (all text goes through textContent) ----------
+function h(tag, attrs, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
   }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return el;
+}
+function render(...nodes) { app.replaceChildren(...nodes, footer()); window.scrollTo(0, 0); }
+function footer() {
+  return h("footer", { class: "muted" }, "Swaypoint · ",
+    h("a", { href: "../privacy/" }, "Privacy"), " · ", h("a", { href: "../terms/" }, "Terms"));
+}
+function toast(text) {
+  const t = document.getElementById("toast");
+  t.textContent = text; t.classList.add("on");
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove("on"), 2600);
+}
+function hex(n) { return "#" + (Number(n) >>> 0).toString(16).padStart(6, "0").slice(-6); }
+function fmtDate(d, opts) { return d.toLocaleDateString("en-GB", opts); }
+function safeURL(u) { try { const x = new URL(u); return x.protocol === "https:" ? x.href : null; } catch { return null; } }
+
+// ---------- data ----------
+const cities = () => {
+  if (Array.isArray(trip.route) && trip.route.length > 1) return trip.route.map(r => ({ name: r.name, country: r.country || "", lat: r.latitude, lon: r.longitude, id: r.city_id }));
+  const c = trip.city || {};
+  return [{ name: trip.city_name, country: c.country || "", lat: c.latitude, lon: c.longitude, id: trip.city_id }];
+};
+const placeName = () => { const c = cities(); return c.length > 1 ? c.map(x => x.name).join(" → ") : trip.city_name; };
+const you = () => members.find(m => m.user_id === me);
+
+function deck() {
+  const places = Array.isArray(trip.places) ? trip.places : [];
+  const byID = new Map(places.map(p => [p.id, p]));
+  const base = (trip.deck || []).map(id => byID.get(id)).filter(Boolean);
+  const ids = new Set(base.map(p => p.id)), names = new Set(base.map(p => (p.name || "").toLowerCase()));
+  const wished = [];
+  for (const w of wishes) {
+    const p = Object.assign({}, w.place, { wishedBy: w.by_name });
+    if (names.has((p.name || "").toLowerCase()) || ids.has(p.id)) continue;
+    ids.add(p.id); wished.push(p);
+  }
+  return wished.concat(base);
+}
+const voteOf = (placeID, user) => (votes.find(v => v.place_id === placeID && v.user_id === user) || {}).vote;
+const swiped = user => deck().filter(p => voteOf(p.id, user)).length;
+const remaining = () => deck().filter(p => !voteOf(p.id, me));
+
+async function loadAll() {
+  const [t, m, v, w, pl] = await Promise.all([
+    db.from("trips").select("id,city_id,city_name,start_date,days,deck,city,places,route,invite_code,owner_id").eq("id", trip.id).single(),
+    db.from("trip_members").select("user_id,display_name,color,is_owner,finished").eq("trip_id", trip.id).order("joined_at"),
+    db.from("votes").select("user_id,place_id,vote").eq("trip_id", trip.id),
+    db.from("trip_wishes").select("id,user_id,by_name,place,created_at").eq("trip_id", trip.id).order("created_at"),
+    db.from("trip_plans").select("plan,updated_at").eq("trip_id", trip.id).maybeSingle(),
+  ]);
+  if (t.data) trip = t.data;
+  if (m.data) members = m.data;
+  if (v.data) {
+    // Keep my own votes that are still on their way to the server.
+    const pending = votes.filter(x => x.user_id === me && x.pending && !v.data.some(y => y.place_id === x.place_id && y.user_id === me));
+    votes = v.data.concat(pending);
+  }
+  if (w.data) wishes = w.data;
+  if (pl && pl.data && pl.data.plan) { try { plan = JSON.parse(pl.data.plan); } catch { plan = null; } }
+}
+
+let refreshTimer = null;
+function refreshSoon() {
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => { await loadAll(); rerenderLive(); }, 350);
+}
+function listen() {
+  if (channel) return;
+  channel = db.channel("web-trip-" + trip.id);
+  for (const table of ["votes", "trip_members", "trip_wishes", "trip_plans"]) {
+    channel.on("postgres_changes", { event: "*", schema: "public", table, filter: "trip_id=eq." + trip.id }, refreshSoon);
+  }
+  channel.subscribe();
+  setInterval(refreshSoon, 30000);   // safety net if an event is missed
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshSoon(); });
+}
+function rerenderLive() {
+  if (screen === "done") showDone();
+  else if (screen === "plan") showPlan();
+  else if (screen === "swipe") updateSquad();
+}
+
+// ---------- screens ----------
+async function boot() {
+  if (!code) return render(h("div", { class: "center" },
+    h("img", { class: "logo", src: "icon.png", alt: "" }), h("h1", {}, "Swaypoint"),
+    h("p", {}, "Open the invite link your friend sent you."),
+    h("a", { class: "btn primary", href: APP_STORE }, "Get Swaypoint for iPhone")));
+  if (!window.supabase) return fail("Couldn't load Swaypoint. Check your connection and reload.");
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, storageKey: "swaypoint-web" } });
+  let { data: { session } } = await db.auth.getSession();
+  if (!session) {
+    const res = await db.auth.signInAnonymously();
+    if (res.error) return fail("Couldn't connect right now. Check your connection and reload.");
+    session = res.data.session;
+  }
+  me = session.user.id;
+  const { data, error } = await db.rpc("trip_preview", { p_code: code });
+  if (error) return fail("Couldn't open the invite. Check your connection and reload.");
+  const preview = (data || [])[0];
+  if (!preview) return fail("This invite doesn't exist any more. Ask your friend for a new link.");
+  if (preview.already_member) {
+    trip = { id: preview.trip_id };
+    await loadAll(); listen();
+    return route();
+  }
+  showPreview(preview);
+}
+
+function fail(text) {
+  render(h("div", { class: "center" }, h("img", { class: "logo", src: "icon.png", alt: "" }),
+    h("h1", {}, "Invite not found"), h("p", {}, text),
+    h("button", { class: "btn secondary", onclick: () => location.reload() }, "Try Again")));
+}
+
+function showPreview(preview) {
+  screen = "preview";
+  const names = preview.route_names && preview.route_names.length > 1
+    ? preview.route_names.slice(0, -1).join(", ") + " and " + preview.route_names[preview.route_names.length - 1] : preview.city_name;
+  const start = new Date(preview.start_date + "T12:00:00");
+  const end = new Date(start); end.setDate(end.getDate() + preview.days - 1);
+  const organizer = preview.organizer || "A friend";
+  const name = h("input", { type: "text", placeholder: "Your first name", maxlength: "30", autocomplete: "given-name", id: "name" });
+  name.value = localStorage.getItem("swaypoint-name") || "";
+  const cover = safeURL(preview.cover_image);
+  const join = h("button", { class: "btn primary", id: "join" }, "Join and Start Swiping");
+  join.addEventListener("click", async () => {
+    const n = name.value.trim();
+    if (!n) { name.focus(); toast("Add your name so the group knows who's who."); return; }
+    join.disabled = true; join.textContent = "Joining…";
+    localStorage.setItem("swaypoint-name", n);
+    const { data, error } = await db.rpc("join_trip", { p_code: code, p_display_name: n, p_color: PALETTE[Math.floor(Math.random() * PALETTE.length)] });
+    if (error) { join.disabled = false; join.textContent = "Join and Start Swiping"; toast(error.message.includes("full") ? "This trip is full (12 people)." : "Couldn't join. Try again."); return; }
+    trip = { id: (Array.isArray(data) ? data[0] : data).id };
+    await loadAll(); listen();
+    showWishes(true);
+  });
+  render(
+    cover ? h("img", { class: "cover", src: cover, alt: "" }) : h("div", { class: "center" }, h("img", { class: "logo", src: "icon.png", alt: "" })),
+    h("h1", {}, organizer + " invited you to plan " + names),
+    h("p", {}, fmtDate(start, { day: "numeric", month: "short" }) + " – " + fmtDate(end, { day: "numeric", month: "short", year: "numeric" }) +
+      " · " + preview.days + (preview.days === 1 ? " day" : " days") + " · with " + preview.member_names.join(", ")),
+    isIOS ? h("div", {},
+      h("a", { class: "btn primary", href: "swaypoint://join?code=" + encodeURIComponent(code) }, "Open in the Swaypoint App"),
+      h("a", { class: "btn secondary", href: APP_STORE }, "Get the App"),
+      h("div", { class: "section" }, "Or swipe right here")) : null,
+    h("p", { class: "small" }, "Swipe on the places you want to see. Takes 2 minutes, no account needed."),
+    name, join);
+}
+
+function route() {
+  const d = deck();
+  if (!d.length) return showDone();
+  if (plan && remaining().length === 0) return showPlan();
+  if (remaining().length === 0) return showDone();
+  const mine = wishes.filter(w => w.user_id === me).length;
+  if (swiped(me) === 0 && mine === 0 && !sessionStorage.getItem("wishes-seen-" + trip.id)) return showWishes(true);
+  showSwipe();
+}
+
+// Must-sees: search Wikipedia for places and events near the trip's cities.
+function showWishes(continueAfter) {
+  screen = "wishes";
+  sessionStorage.setItem("wishes-seen-" + trip.id, "1");
+  const list = h("div", {});
+  const results = h("div", {});
+  const input = h("input", { type: "text", placeholder: "e.g. a park, a festival, a restaurant", autocomplete: "off" });
+  const names = cities().map(c => c.name);
+  let timer = null, last = "";
+  function drawMine() {
+    const mine = wishes.filter(w => w.user_id === me);
+    list.replaceChildren(...(mine.length ? [h("div", { class: "section" }, "Your must-sees (" + mine.length + ")")] : []),
+      ...mine.map(w => h("div", { class: "card row" },
+        thumb(w.place), h("div", { class: "grow" }, h("div", { class: "title ellipsis" }, w.place.name), h("div", { class: "small", style: "color:var(--orange);font-weight:700" }, "★ Must-see")),
+        h("button", { class: "iconbtn", "aria-label": "Remove", onclick: () => removeWish(w).then(drawMine) }, "×"))));
+  }
+  async function search(q) {
+    if (q.length < 2) { results.replaceChildren(); return; }
+    results.replaceChildren(h("div", { class: "spinner" }));
+    const found = await wikiSearch(q);
+    if (input.value.trim() !== q) return;
+    if (!found.length) { results.replaceChildren(h("p", { class: "center small", style: "margin-top:18px" }, "Nothing found near " + names.join(" or ") + ". Try the English name.")); return; }
+    results.replaceChildren(h("div", { class: "section" }, "Results"), ...found.map(f => {
+      const added = () => wishes.some(w => w.user_id === me && w.place.id === f.place.id);
+      const btn = h("button", { class: "iconbtn" + (added() ? " on" : ""), "aria-label": "Add as must-see" }, added() ? "★" : "+");
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        if (added()) await removeWish(wishes.find(w => w.user_id === me && w.place.id === f.place.id));
+        else await addWish(f.place);
+        btn.disabled = false; btn.classList.toggle("on", added()); btn.textContent = added() ? "★" : "+"; drawMine();
+      });
+      return h("div", { class: "card row" }, thumb(f.place),
+        h("div", { class: "grow" }, h("div", { class: "title" }, f.place.name), h("div", { class: "small muted" }, f.subtitle),
+          f.distance ? h("div", { class: "small", style: "color:#0E7490;font-weight:650" }, f.distance) : null), btn);
+    }));
+  }
+  input.addEventListener("input", () => {
+    const q = input.value.trim(); if (q === last) return; last = q;
+    clearTimeout(timer); timer = setTimeout(() => search(q), 350);
+  });
+  drawMine();
+  render(
+    h("h1", {}, "Anything you really want to see?"),
+    h("p", {}, "A place, a festival, a restaurant in or near " + names.join(" or ") + ". Everyone gets it as a card first, with your star on it."),
+    input, list, results,
+    h("div", { style: "position:sticky;bottom:12px;margin-top:16px" },
+      h("button", { class: "btn primary", onclick: () => continueAfter ? showSwipe() : showSwipe() }, "Start Swiping")));
+}
+
+function thumb(p) {
+  const src = safeURL(p.imageURL);
+  return src ? h("img", { src, alt: "", loading: "lazy" }) : h("div", { class: "thumb" });
+}
+
+function distanceKm(a, b) {
+  const R = 6371, toRad = x => x * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat), dLon = toRad(b.lon - a.lon);
+  const s = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+async function wikiSearch(q) {
+  const base = "https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&redirects=1" +
+    "&prop=description|extracts|pageimages|coordinates|pageprops&exintro=1&explaintext=1&exsentences=2&exlimit=20" +
+    "&piprop=thumbnail&pithumbsize=960&ppprop=wikibase_item&colimit=20";
+  const get = url => fetch(url).then(r => r.json()).then(j => (j.query && j.query.pages) || []).catch(() => []);
+  const [a, b] = await Promise.all([
+    get(base + "&generator=prefixsearch&gpslimit=6&gpsnamespace=0&gpssearch=" + encodeURIComponent(q)),
+    get(base + "&generator=search&gsrlimit=10&gsrnamespace=0&gsrsearch=" + encodeURIComponent(q)),
+  ]);
+  const sort = arr => arr.slice().sort((x, y) => (x.index || 99) - (y.index || 99));
+  const seen = new Set(), out = [];
+  const skip = ["disambiguation", "film", "album", "song", "novel", "band", "footballer", "politician", "actor", "actress",
+    "singer", "television", "video game", "species", "genus", "company", "mascot", "character", "anime", "manga", "surname", "given name"];
+  const events = ["festival", "carnival", "parade", "concert", "tournament", "championship", "grand prix", "marathon", "fair", "matsuri", "fireworks", "exhibition", "celebration"];
+  const cs = cities();
+  for (const page of sort(a).concat(sort(b))) {
+    if (seen.has(page.title)) continue; seen.add(page.title);
+    const desc = page.description || "";
+    const lower = (desc + " " + page.title).toLowerCase();
+    if (skip.some(w => lower.includes(w))) continue;
+    const coord = page.coordinates && page.coordinates[0];
+    const event = events.some(w => lower.includes(w));
+    let nearest = null;
+    if (coord) {
+      for (const c of cs) if (c.lat != null) { const km = distanceKm({ lat: coord.lat, lon: coord.lon }, c); if (!nearest || km < nearest.km) nearest = { c, km }; }
+      if (!nearest || nearest.km > 300) continue;
+    } else {
+      const c = cs.find(x => lower.includes(x.name.toLowerCase()));
+      if (c) nearest = { c, km: 0 };
+      else if (!event) continue;
+    }
+    const km = nearest ? nearest.km : 0;
+    const id = (page.pageprops && page.pageprops.wikibase_item) || ("wish-wiki-" + page.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"));
+    const place = {
+      id, name: page.title, category: event ? "experience" : category(lower), area: nearest ? (km < 3 ? "Central " + nearest.c.name : km <= 35 ? nearest.c.name + " area" : "Near " + nearest.c.name) : "Event",
+      visitMinutes: km > 35 ? 180 : event ? 180 : 90, price: event ? "Tickets" : "Check",
+      blurb: (page.extract || desc || "").replace(/\s*\([^)]*\)/g, ""), symbol: event ? "party.popper.fill" : "star.fill", tint: 0xD97706,
+      opensAt: 9, closesAt: 20, popularity: 1, hiddenGem: false,
+      wikidataID: page.pageprops && page.pageprops.wikibase_item, wikiTitle: page.title,
+      imageURL: page.thumbnail && page.thumbnail.source, latitude: coord ? coord.lat : null, longitude: coord ? coord.lon : null,
+      cityID: nearest ? nearest.c.id : null, dayTrip: km > 35 ? Math.round(km) + " km from " + nearest.c.name : null,
+    };
+    out.push({ place, subtitle: desc ? desc.charAt(0).toUpperCase() + desc.slice(1) : "", distance: nearest ? (km < 8 ? "In " + nearest.c.name : Math.round(km) + " km from " + nearest.c.name) : null });
+    if (out.length >= 10) break;
+  }
+  return out;
+}
+function category(t) {
+  const rules = [["museum", ["museum", "gallery"]], ["park", ["park", "garden", "forest", "lake", "beach", "zoo", "aquarium"]],
+    ["viewpoint", ["tower", "viewpoint", "observation", "mountain", "hill"]], ["market", ["market", "bazaar"]],
+    ["food", ["restaurant", "cafe", "café", "bakery"]], ["nightlife", ["bar", "club", "theatre", "theater", "opera"]]];
+  for (const [cat, words] of rules) if (words.some(w => t.includes(w))) return cat;
+  return "landmark";
+}
+
+async function addWish(place) {
+  const mine = you();
+  const row = { trip_id: trip.id, user_id: me, by_name: mine ? mine.display_name : localStorage.getItem("swaypoint-name"), place };
+  const { data, error } = await db.from("trip_wishes").insert(row).select("id,user_id,by_name,place,created_at").single();
+  if (error) { toast(error.message.includes("too many") ? "That's 10 must-sees already." : "Couldn't add it. Try again."); return; }
+  wishes.push(data);
+  await castVote(place.id, "mustSee");
+}
+async function removeWish(w) {
+  if (!w) return;
+  await db.from("trip_wishes").delete().eq("id", w.id);
+  await db.from("votes").delete().eq("trip_id", trip.id).eq("user_id", me).eq("place_id", w.place.id);
+  wishes = wishes.filter(x => x.id !== w.id);
+  votes = votes.filter(v => !(v.user_id === me && v.place_id === w.place.id));
+}
+async function castVote(placeID, vote) {
+  votes = votes.filter(v => !(v.user_id === me && v.place_id === placeID));
+  const local = { user_id: me, place_id: placeID, vote, pending: true };
+  votes.push(local);
+  const { error } = await db.from("votes").upsert({ trip_id: trip.id, user_id: me, place_id: placeID, vote }, { onConflict: "trip_id,user_id,place_id" });
+  if (error) { toast("A vote didn't save. Check your connection."); return; }
+  local.pending = false;
+  if (remaining().length === 0) await db.from("trip_members").update({ finished: true }).eq("trip_id", trip.id).eq("user_id", me);
+}
+
+// ---------- swiping ----------
+let squadEl = null, countEl = null, barEl = null;
+function showSwipe() {
+  screen = "swipe";
+  const left = remaining();
+  if (!left.length) return showDone();
+  const total = deck().length;
+  const place = left[0];
+  const card = cardFor(place);
+  const deckEl = h("div", { class: "deck" }, left[1] ? h("div", { class: "swipecard", style: "transform:scale(.95) translateY(14px);opacity:.7" }) : null, card);
+  barEl = h("div", {}); countEl = h("span", { class: "small muted" });
+  squadEl = h("div", { class: "small muted center", style: "margin-top:12px" });
+  render(
+    h("div", { class: "topline" }, h("strong", {}, placeName())),
+    h("div", { class: "topline", style: "margin-top:8px" }, h("div", { class: "bar" }, barEl), countEl),
+    deckEl,
+    h("div", { class: "actions" },
+      h("button", { class: "round", "aria-label": "Skip", onclick: () => decide(card, place, "skip") }, "✕"),
+      h("button", { class: "round small", "aria-label": "Must-see", style: "color:var(--orange)", onclick: () => decide(card, place, "mustSee") }, "★"),
+      h("button", { class: "round", "aria-label": "Want to go", style: "color:var(--coral)", onclick: () => decide(card, place, "want") }, "♥")),
+    squadEl,
+    h("button", { class: "btn link", onclick: () => showWishes(false) }, "+ Add a must-see"));
+  updateSquad(total);
+  drag(card, place);
+}
+function updateSquad(total) {
+  if (!barEl) return;
+  total = total || deck().length;
+  const done = swiped(me);
+  barEl.style.width = (total ? done / total * 100 : 0) + "%";
+  countEl.textContent = done + " of " + total;
+  const others = members.filter(m => m.user_id !== me);
+  squadEl.textContent = others.length ? others.map(m => m.display_name + " " + (swiped(m.user_id) >= total ? "✓" : swiped(m.user_id) + "/" + total)).join("  ·  ") : "";
+}
+function cardFor(p) {
+  const src = safeURL(p.imageURL);
+  const badges = [];
+  if (p.wishedBy) badges.push(h("span", { class: "pill", style: "background:var(--orange)" }, "★ " + p.wishedBy + "'s must-see"));
+  if (cities().length > 1 && p.cityID) { const c = cities().find(x => x.id === p.cityID); if (c) badges.push(h("span", { class: "pill", style: "background:var(--indigo)" }, c.name)); }
+  if (p.dayTrip) badges.push(h("span", { class: "pill", style: "background:#0E7490" }, "Day trip · " + p.dayTrip));
+  else if (p.hiddenGem) badges.push(h("span", { class: "pill", style: "background:var(--orange)" }, "Hidden gem"));
+  const mins = p.visitMinutes || 60;
+  const dur = mins >= 60 ? Math.floor(mins / 60) + " h" + (mins % 60 ? " " + (mins % 60) : "") : mins + " min";
+  const cat = (p.category || "").charAt(0).toUpperCase() + (p.category || "").slice(1);
+  return h("div", { class: "swipecard" },
+    h("div", { class: "photo", style: src ? "background-image:url(\"" + src.replace(/"/g, "%22") + "\")" : "background:" + hex(p.tint || 0xE8552F) },
+      src ? h("span", { class: "credit" }, "Photo: Wikimedia Commons") : null),
+    h("div", { class: "info" },
+      badges.length ? h("div", { class: "tags" }, badges) : null,
+      h("h3", {}, p.name),
+      h("div", { class: "tags" }, h("span", { class: "tag" }, cat), h("span", { class: "tag" }, "⏱ " + dur), p.price ? h("span", { class: "tag" }, p.price) : null),
+      h("p", { class: "blurb" }, p.blurb || ""),
+      h("div", { class: "small muted", style: "margin-top:8px" }, "📍 " + (p.area || ""))),
+    h("div", { class: "stamp want" }, "WANT"), h("div", { class: "stamp skip" }, "SKIP"), h("div", { class: "stamp must" }, "MUST-SEE"));
+}
+let busy = false;
+async function decide(card, place, vote) {
+  if (busy) return; busy = true;
+  const x = vote === "want" ? 700 : vote === "skip" ? -700 : 0, y = vote === "mustSee" ? -1000 : 60;
+  card.style.transition = "transform .25s ease-in";
+  card.style.transform = "translate(" + x + "px," + y + "px) rotate(" + (x / 25) + "deg)";
+  if (navigator.vibrate) navigator.vibrate(12);
+  castVote(place.id, vote);
+  setTimeout(() => { busy = false; showSwipe(); }, 240);
+}
+function drag(card, place) {
+  let sx = 0, sy = 0, dx = 0, dy = 0, down = false;
+  const stamps = { want: card.querySelector(".stamp.want"), skip: card.querySelector(".stamp.skip"), must: card.querySelector(".stamp.must") };
+  card.addEventListener("pointerdown", e => { down = true; sx = e.clientX; sy = e.clientY; card.setPointerCapture(e.pointerId); card.style.transition = "none"; });
+  card.addEventListener("pointermove", e => {
+    if (!down) return; dx = e.clientX - sx; dy = e.clientY - sy;
+    card.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + (dx / 18) + "deg)";
+    stamps.want.style.opacity = Math.max(0, dx / 100); stamps.skip.style.opacity = Math.max(0, -dx / 100); stamps.must.style.opacity = Math.max(0, -dy / 110);
+  });
+  const end = () => {
+    if (!down) return; down = false;
+    if (dx > 110) decide(card, place, "want");
+    else if (dx < -110) decide(card, place, "skip");
+    else if (dy < -130) decide(card, place, "mustSee");
+    else { card.style.transition = "transform .3s"; card.style.transform = ""; for (const s of Object.values(stamps)) s.style.opacity = 0; }
+    dx = dy = 0;
+  };
+  card.addEventListener("pointerup", end); card.addEventListener("pointercancel", end);
+}
+
+// ---------- after swiping ----------
+function matches() {
+  const n = members.length || 1;
+  return deck().map(p => {
+    const vs = members.map(m => voteOf(p.id, m.user_id)).filter(Boolean);
+    const yes = vs.filter(v => v !== "skip").length;
+    const must = members.filter(m => voteOf(p.id, m.user_id) === "mustSee").map(m => m.display_name);
+    return { p, yes, must, n };
+  }).filter(m => m.yes > 0).sort((a, b) => (b.must.length - a.must.length) || (b.yes - a.yes));
+}
+function showDone() {
+  screen = "done";
+  if (plan) return showPlan();
+  const total = deck().length;
+  const others = members.filter(m => m.user_id !== me);
+  const all = matches();
+  const everyone = all.filter(m => m.yes === m.n);
+  render(
+    h("h1", {}, remaining().length ? "Keep swiping" : "You're done!"),
+    h("p", {}, plan ? "The plan is ready." : "When the group has swiped, someone builds the plan in the app and it shows up here."),
+    others.length ? h("div", { class: "card" }, others.map(m => {
+      const d = Math.min(swiped(m.user_id), total);
+      return h("div", { class: "row", style: "margin:6px 0" },
+        h("span", { class: "pill", style: "background:" + hex(m.color) + ";width:28px;height:28px;justify-content:center;padding:0" }, (m.display_name || "?").charAt(0).toUpperCase()),
+        h("div", { class: "grow" }, h("div", { class: "ellipsis" }, m.display_name), h("div", { class: "bar" }, h("div", { style: "width:" + (total ? d / total * 100 : 0) + "%" }))),
+        h("span", { class: "small", style: "font-weight:700;color:" + (d >= total ? "var(--green)" : "var(--muted)") }, d >= total ? "Done" : d + "/" + total));
+    })) : null,
+    remaining().length ? h("button", { class: "btn primary", onclick: showSwipe }, "Swipe the New Cards (" + remaining().length + ")") : null,
+    h("div", { class: "section" }, everyone.length ? "Everyone wants to go (" + everyone.length + ")" : "Your group's picks so far"),
+    ...(everyone.length ? everyone : all).slice(0, 25).map(m => h("div", { class: "card row" }, thumb(m.p),
+      h("div", { class: "grow" }, h("div", { class: "title" }, m.p.name),
+        m.must.length ? h("div", { class: "small", style: "color:var(--orange);font-weight:650" }, "★ Must-see for " + m.must.join(", ")) : h("div", { class: "small muted" }, (m.p.area || ""))),
+      h("strong", { style: "color:" + (m.yes === m.n ? "var(--green)" : "var(--muted)") }, m.yes + "/" + m.n))),
+    h("button", { class: "btn link", onclick: () => showWishes(false) }, "+ Add a must-see"),
+    isIOS ? h("a", { class: "btn secondary", href: APP_STORE }, "Get the App for the Full Plan") : null);
+}
+
+function showPlan() {
+  screen = "plan";
+  if (!plan || !Array.isArray(plan.days) || !plan.days.length) return showDone();
+  planDay = Math.min(planDay, plan.days.length - 1);
+  const toDate = s => new Date((typeof s === "number" ? s : Date.parse(s) / 1000) * 1000);
+  const day = plan.days[planDay];
+  const tabs = h("div", { class: "daytabs" }, plan.days.map((d, i) => h("button", { class: "daytab" + (i === planDay ? " on" : ""), onclick: () => { planDay = i; showPlan(); } },
+    fmtDate(toDate(d.date), { weekday: "short" }), h("br"), fmtDate(toDate(d.date), { day: "numeric" }))));
+  const w = day.weather;
+  render(
+    h("h1", {}, placeName()),
+    h("p", {}, "Your group's plan · " + plan.days.length + (plan.days.length === 1 ? " day" : " days")),
+    tabs,
+    h("div", { class: "card day" },
+      h("h2", {}, fmtDate(toDate(day.date), { weekday: "long", day: "numeric", month: "long" })),
+      h("p", { class: "small" }, (day.city ? day.city + " · " : "") + (day.theme || "") + (w ? " · " + Math.round(w.maxTemp) + "° / " + Math.round(w.minTemp) + "°" : "")),
+      (day.stops || []).map(s => h("div", { class: "stop" },
+        h("div", { class: "time" }, toDate(s.start).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })),
+        h("div", { class: "grow" },
+          s.travelBefore ? h("div", { class: "travel" }, "↳ " + s.travelBefore) : null,
+          h("div", { class: "title" }, s.title),
+          h("div", { class: "small muted" }, s.subtitle || ""))))),
+    remaining().length ? h("button", { class: "btn secondary", onclick: showSwipe }, "Swipe the New Cards (" + remaining().length + ")") : null,
+    isIOS ? h("a", { class: "btn primary", href: APP_STORE }, "Get the App: Maps, Directions, Live Changes") :
+      h("p", { class: "small center" }, "The plan updates here when someone in the group changes it."));
+}
+
+boot().catch(err => { console.error(err); fail("Something went wrong. Reload the page to try again."); });
 </script>
 </body>
 </html>
