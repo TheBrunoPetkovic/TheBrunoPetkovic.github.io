@@ -360,7 +360,8 @@ async function wikiSearch(q) {
   const sort = arr => arr.slice().sort((x, y) => (x.index || 99) - (y.index || 99));
   const seen = new Set(), out = [];
   const skip = ["disambiguation", "film", "album", "song", "novel", "band", "footballer", "politician", "actor", "actress",
-    "singer", "television", "video game", "species", "genus", "company", "mascot", "character", "anime", "manga", "surname", "given name"];
+    "singer", "television", "video game", "species", "genus", "company", "mascot", "character", "anime", "manga", "surname", "given name",
+    "railway station", "train station", "metro station", "bus station", "ward of", "district of", "neighbourhood of", "neighborhood of", "prefecture of", "municipality"];
   const events = ["festival", "carnival", "parade", "concert", "tournament", "championship", "grand prix", "marathon", "fair", "matsuri", "fireworks", "exhibition", "celebration"];
   const cs = cities();
   for (const page of sort(a).concat(sort(b))) {
