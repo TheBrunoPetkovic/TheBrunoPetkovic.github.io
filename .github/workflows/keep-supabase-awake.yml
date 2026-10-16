@@ -1,0 +1,21 @@
+# Free Supabase projects pause after a week without activity. This makes one tiny read
+# every two days so Swaypoint's backend stays up while it's on the free plan.
+# Remove it once the project is on Supabase Pro (Pro projects never pause).
+name: Keep Supabase awake
+
+on:
+  schedule:
+    - cron: "17 6 */2 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read one row through the public API
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://bnbwouyocmjgaratrdyj.supabase.co/rest/v1/trips?select=id&limit=1" \
+            -H "apikey: sb_publishable_hn4mgxZShl35k0ucOGUUsw_scbHhPI1")
+          echo "Supabase answered $status"
+          test "$status" = "200"
