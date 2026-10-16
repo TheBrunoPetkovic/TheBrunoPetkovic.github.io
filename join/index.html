@@ -320,7 +320,8 @@ function showWishes(continueAfter) {
       });
       return h("div", { class: "card row" }, thumb(f.place),
         h("div", { class: "grow" }, h("div", { class: "title" }, f.place.name), h("div", { class: "small muted" }, f.subtitle),
-          f.distance ? h("div", { class: "small", style: "color:#0E7490;font-weight:650" }, f.distance) : null), btn);
+          f.distance ? h("div", { class: "small", style: "color:#0E7490;font-weight:650" }, f.distance) : null,
+          f.offSeason ? h("div", { class: "small", style: "color:var(--orange);font-weight:650" }, "⚠︎ " + f.offSeason) : null), btn);
     }));
   }
   input.addEventListener("input", () => {
@@ -350,7 +351,7 @@ function distanceKm(a, b) {
 
 async function wikiSearch(q) {
   const base = "https://en.wikipedia.org/w/api.php?origin=*&action=query&format=json&formatversion=2&redirects=1" +
-    "&prop=description|extracts|pageimages|coordinates|pageprops&exintro=1&explaintext=1&exsentences=2&exlimit=20" +
+    "&prop=description|extracts|pageimages|coordinates|pageprops&exintro=1&explaintext=1&exsentences=3&exlimit=20" +
     "&piprop=thumbnail&pithumbsize=960&ppprop=wikibase_item&colimit=20";
   const get = url => fetch(url).then(r => r.json()).then(j => (j.query && j.query.pages) || []).catch(() => []);
   const [a, b] = await Promise.all([
@@ -391,9 +392,46 @@ async function wikiSearch(q) {
       imageURL: page.thumbnail && page.thumbnail.source, latitude: coord ? coord.lat : null, longitude: coord ? coord.lon : null,
       cityID: nearest ? nearest.c.id : null, dayTrip: km > 35 ? Math.round(km) + " km from " + nearest.c.name : null,
     };
-    out.push({ place, subtitle: desc ? desc.charAt(0).toUpperCase() + desc.slice(1) : "", distance: nearest ? (km < 8 ? "In " + nearest.c.name : Math.round(km) + " km from " + nearest.c.name) : null });
+    const months = event ? eventMonths(desc + ". " + (page.extract || "")) : null;
+    let offSeason = null;
+    if (months) {
+      place.eventMonths = months;
+      place.bookingHint = "Usually held in " + monthNames(months) + ". Check this year's dates and get tickets early.";
+      if (!months.some(m => tripMonths().has(m))) offSeason = "Usually in " + monthNames(months) + ", not during your trip";
+    }
+    out.push({ place, offSeason, subtitle: desc ? desc.charAt(0).toUpperCase() + desc.slice(1) : "", distance: nearest ? (km < 8 ? "In " + nearest.c.name : Math.round(km) + " km from " + nearest.c.name) : null });
     if (out.length >= 10) break;
   }
+  return out;
+}
+const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+// The months an event's article mentions ("held every July"); null when none or too many.
+function eventMonths(text) {
+  const t = text.toLowerCase();
+  let found = [];
+  MONTHS.forEach((w, i) => {
+    const re = (w === "may" || w === "march")
+      ? new RegExp("(\\b(in|during|early|late|mid|from|until|to|through|of|each|every)[ -]" + w + "\\b)|(\\b\\d{1,2}(st|nd|rd|th)? " + w + "\\b)|(\\b" + w + " \\d{1,2}\\b)")
+      : new RegExp("\\b" + w + "\\b");
+    if (re.test(t)) found.push(i + 1);
+  });
+  if (!found.length || found.length > 4) return null;
+  if (found.length === 2 && found[1] - found[0] > 1 && found[1] - found[0] <= 3 &&
+      new RegExp("(from|between) .{0,20}" + MONTHS[found[0] - 1] + ".{0,25}(to|and|until|through)").test(t)) {
+    const [a, b] = found; found = []; for (let m = a; m <= b; m++) found.push(m);
+  }
+  return found;
+}
+function monthNames(ms) {
+  const n = ms.map(m => MONTHS[m - 1].charAt(0).toUpperCase() + MONTHS[m - 1].slice(1));
+  if (n.length === 1) return n[0];
+  if (n.length === 2) return n[0] + " and " + n[1];
+  const contiguous = ms.every((m, i) => i === 0 || m === ms[i - 1] + 1);
+  return contiguous ? n[0] + " to " + n[n.length - 1] : n.slice(0, -1).join(", ") + " or " + n[n.length - 1];
+}
+function tripMonths() {
+  const out = new Set(), start = new Date(trip.start_date + "T12:00:00");
+  for (let i = 0; i < Math.max(1, trip.days); i++) { const d = new Date(start); d.setDate(d.getDate() + i); out.add(d.getMonth() + 1); }
   return out;
 }
 function category(t) {
