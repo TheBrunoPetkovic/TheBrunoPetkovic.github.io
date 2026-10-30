@@ -1,11 +1,12 @@
-# Free Supabase projects pause after a week without activity. This pings Swaypoint's
-# backend every day (database through the REST API, plus the auth service) so it stays up
-# while it's on the free plan. The project is on the wudygamer@gmail.com Supabase account.
+# Free Supabase projects pause after a week without "sufficient user database activity".
+# This runs every day and calls keepalive(), a database function that writes one row
+# (migration 20261030_008_keepalive.sql in the swaypoint repo), then checks the auth
+# service. The project is on the wudygamer@gmail.com Supabase account.
 #
-# It ran every two days until Oct 2026 and the project still got paused between two runs,
-# so it now runs daily and touches two services. If a run fails, GitHub emails the repo
-# owner: a failure here means the app can't sign anyone in, so restore the project in the
-# Supabase dashboard right away.
+# Until Oct 2026 it only read the trips table every two days. Row level security made that
+# read return nothing, and the project got paused anyway, so it now does a real write.
+# If a run fails, GitHub emails the repo owner: a failure here means the app can't sign
+# anyone in, so restore the project in the Supabase dashboard right away.
 #
 # Remove it once the project is on Supabase Pro (Pro projects never pause).
 name: Keep Supabase awake
@@ -19,13 +20,14 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Read from the database and check auth
+      - name: Write to the database and check auth
         env:
           BASE: https://bnbwouyocmjgaratrdyj.supabase.co
           KEY: sb_publishable_hn4mgxZShl35k0ucOGUUsw_scbHhPI1
         run: |
           db=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 20 \
-            "$BASE/rest/v1/trips?select=id&limit=1" -H "apikey: $KEY")
+            -X POST "$BASE/rest/v1/rpc/keepalive" -H "apikey: $KEY" \
+            -H "Content-Type: application/json" -d '{}')
           auth=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 20 \
             "$BASE/auth/v1/settings" -H "apikey: $KEY")
           echo "Database answered $db, auth answered $auth"
