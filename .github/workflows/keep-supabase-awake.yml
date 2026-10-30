@@ -1,21 +1,32 @@
-# Free Supabase projects pause after a week without activity. This makes one tiny read
-# every two days so Swaypoint's backend stays up while it's on the free plan.
+# Free Supabase projects pause after a week without activity. This pings Swaypoint's
+# backend every day (database through the REST API, plus the auth service) so it stays up
+# while it's on the free plan. The project is on the wudygamer@gmail.com Supabase account.
+#
+# It ran every two days until Oct 2026 and the project still got paused between two runs,
+# so it now runs daily and touches two services. If a run fails, GitHub emails the repo
+# owner: a failure here means the app can't sign anyone in, so restore the project in the
+# Supabase dashboard right away.
+#
 # Remove it once the project is on Supabase Pro (Pro projects never pause).
 name: Keep Supabase awake
 
 on:
   schedule:
-    - cron: "17 6 */2 * *"
+    - cron: "17 6 * * *"
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Read one row through the public API
+      - name: Read from the database and check auth
+        env:
+          BASE: https://bnbwouyocmjgaratrdyj.supabase.co
+          KEY: sb_publishable_hn4mgxZShl35k0ucOGUUsw_scbHhPI1
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://bnbwouyocmjgaratrdyj.supabase.co/rest/v1/trips?select=id&limit=1" \
-            -H "apikey: sb_publishable_hn4mgxZShl35k0ucOGUUsw_scbHhPI1")
-          echo "Supabase answered $status"
-          test "$status" = "200"
+          db=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 20 \
+            "$BASE/rest/v1/trips?select=id&limit=1" -H "apikey: $KEY")
+          auth=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 --retry-delay 20 \
+            "$BASE/auth/v1/settings" -H "apikey: $KEY")
+          echo "Database answered $db, auth answered $auth"
+          test "$db" = "200" && test "$auth" = "200"
