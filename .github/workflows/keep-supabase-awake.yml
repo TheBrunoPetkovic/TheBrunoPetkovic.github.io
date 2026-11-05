@@ -1,10 +1,12 @@
 # Free Supabase projects pause after a week without "sufficient user database activity".
-# This runs every day and calls keepalive(), a database function that writes one row
+# This runs every six hours and calls keepalive(), a database function that writes one row
 # (migration 20261030_008_keepalive.sql in the swaypoint repo), then checks the auth
 # service. The project is on the wudygamer@gmail.com Supabase account.
 #
 # Until Oct 2026 it only read the trips table every two days. Row level security made that
 # read return nothing, and the project got paused anyway, so it now does a real write.
+# In Nov 2026 Supabase still sent a pause warning with one write a day (their docs ask for
+# "a few user requests to the database each day"), so it now runs four times a day.
 # If a run fails, GitHub emails the repo owner: a failure here means the app can't sign
 # anyone in, so restore the project in the Supabase dashboard right away.
 #
@@ -13,7 +15,7 @@ name: Keep Supabase awake
 
 on:
   schedule:
-    - cron: "17 6 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 jobs:
