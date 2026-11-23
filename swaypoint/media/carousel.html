@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>c</title>
+<style>body{margin:0;background:#222;color:#fff;font-family:-apple-system,system-ui}canvas{width:216px;height:384px;margin:6px}</style></head><body><div id="out"></div><script>
+const U='https://images.unsplash.com/';
+const S=[
+ {img:'photo-1758470475836-f782eb7b3d35', lines:["the 5 places all 4 of us","agreed on in Kyoto 🇯🇵"], sub:"(no group chat arguing involved)", fx:0.5,fy:0.5},
+ {img:'photo-1563288618-bad048d8d5ce', n:1, title:"Fushimi Inari", note:"4/4 swiped yes ❤️  go before 8am", fx:0.5,fy:0.5},
+ {img:'photo-1758470476051-d77f13f4dc3f', n:2, title:"Kinkaku-ji", note:"4/4 ❤️  the golden one, worth it", fx:0.5,fy:0.5},
+ {img:'photo-1739703482361-7f0546da0dc4', n:3, title:"Kiyomizu-dera", note:"4/4 ❤️  + Sara's must-see ⭐", fx:0.5,fy:0.5},
+ {img:'photo-1625904835711-fa25795530e8', n:4, title:"Arashiyama bamboo", note:"4/4 ❤️  quieter than it looks online", fx:0.5,fy:0.5},
+ {img:'photo-1669002231661-2760cbf6648a', n:5, title:"autumn leaves at night", note:"4/4 ❤️  Kiyomizu lit up in November 🍁", fx:0.5,fy:0.5},
+ {local:'c-last.png'}
+];
+const load=src=>new Promise((res,rej)=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=()=>rej(src);i.src=src;});
+function cover(ctx,img,fx,fy){const W=1080,H=1920;const s=Math.max(W/img.width,H/img.height);const w=img.width*s,h=img.height*s;ctx.drawImage(img,(W-w)*fx,(H-h)*fy,w,h);}
+function box(ctx,text,y,size,bg='#fff',fg='#111'){ctx.font=`800 ${size}px -apple-system, "SF Pro Display", system-ui, "Apple Color Emoji"`;const w=ctx.measureText(text).width;const px=30,ph=size*0.32;const x=540-w/2;const h=size*1.25;ctx.fillStyle=bg;rr(ctx,x-px,y-h*0.8,w+px*2,h+ph*0.2,22);ctx.fill();ctx.fillStyle=fg;ctx.textBaseline='alphabetic';ctx.fillText(text,x,y+size*0.12);}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function shade(ctx){const g=ctx.createLinearGradient(0,0,0,700);g.addColorStop(0,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,1080,700);const g2=ctx.createLinearGradient(0,1300,0,1920);g2.addColorStop(0,'rgba(0,0,0,0)');g2.addColorStop(1,'rgba(0,0,0,.5)');ctx.fillStyle=g2;ctx.fillRect(0,1300,1080,620);}
+window.done=false; window.blobs=[];
+(async()=>{for(let k=0;k<S.length;k++){const s=S[k];const c=document.createElement('canvas');c.width=1080;c.height=1920;const ctx=c.getContext('2d');
+ if(s.local){ctx.drawImage(await load(s.local),0,0,1080,1920);} else {const img=await load(U+s.img+'?w=2000&q=85&fm=jpg'); cover(ctx,img,s.fx,s.fy); shade(ctx);
+  if(s.lines){ s.lines.forEach((l,i)=>box(ctx,l,420+i*120,74)); ctx.font='600 40px -apple-system, system-ui'; ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=12; ctx.fillText(s.sub,540,650); ctx.textAlign='left'; ctx.shadowBlur=0;}
+  else { box(ctx,`${s.n}. ${s.title}`,380,78); ctx.font='700 44px -apple-system, system-ui, "Apple Color Emoji"'; ctx.textAlign='center'; ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,.6)'; ctx.shadowBlur=14; ctx.fillText(s.note,540,500); ctx.shadowBlur=0; ctx.textAlign='left'; }
+ }
+ document.getElementById('out').appendChild(c); window.blobs.push(await new Promise(r=>c.toBlob(r,'image/jpeg',0.92)));}
+ window.done=true;})().catch(e=>{window.err=String(e)});
+window.downloadAll=async()=>{for(let k=0;k<blobs.length;k++){const a=document.createElement('a');a.href=URL.createObjectURL(blobs[k]);a.download=`swaypoint_kyoto_${k+1}.jpg`;document.body.appendChild(a);a.click();await new Promise(r=>setTimeout(r,900));}return blobs.length;};
+</script></body></html>
